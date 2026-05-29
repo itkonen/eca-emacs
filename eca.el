@@ -425,6 +425,16 @@ chat buffer.  See `eca-chat--doctor-section'."
         (special-mode)))
     (pop-to-buffer out-buf)))
 
+(defun eca--start-or-open-session (session)
+  "Start SESSION or open its chat buffer."
+  (pcase (eca--session-status session)
+    ('stopped (eca-process-start session
+                                 (lambda ()
+                                   (eca--initialize session))
+                                 (-partial #'eca--handle-message session)))
+    ('started (eca-chat-open session))
+    ('starting (eca-info "eca server is already starting"))))
+
 ;;;###autoload
 (defun eca (&optional arg)
   "Start or switch to a eca session.
@@ -435,13 +445,15 @@ When ARG is current prefix, ask for workspace roots to use."
                        (list (funcall eca-find-root-for-buffer-function))))
          (session (or (eca-session)
                       (eca-create-session workspaces))))
-    (pcase (eca--session-status session)
-      ('stopped (eca-process-start session
-                                   (lambda ()
-                                     (eca--initialize session))
-                                   (-partial #'eca--handle-message session)))
-      ('started (eca-chat-open session))
-      ('starting (eca-info "eca server is already starting")))))
+    (eca--start-or-open-session session)))
+
+;;;###autoload
+(defun eca-new-workspace ()
+  "Start a new eca session after asking for workspace roots."
+  (interactive)
+  (let ((session (eca-create-session (eca--discover-workspaces))))
+    (setq-local eca--session-id-cache (eca--session-id session))
+    (eca--start-or-open-session session)))
 
 ;;;###autoload
 (defun eca-stop ()

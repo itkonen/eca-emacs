@@ -59,6 +59,7 @@ M-x package-install eca
 Server / process
 
 - `eca`: Starts eca server/session + open chat
+- `eca-new-workspace`: Start a new eca session with selected workspaces
 - `eca-stop`: Stop eca server/session
 - `eca-restart`: Restart eca server/session
 - `eca-workspaces`: show a view with all worskpaces and chats
@@ -260,6 +261,7 @@ accuracy and transcription speed.
 ### Custom workspaces
 
 Calling `M-x eca` with prefix `C-u` will ask for what workspaces to start the process.
+Use `M-x eca-new-workspace` to always start a new session with selected workspaces.
 
 ## Sandboxing
 
